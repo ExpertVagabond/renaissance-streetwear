@@ -43,15 +43,48 @@ function ambientFloat(product, t, seed) {
 //     force = -STIFFNESS * sway  -  DAMPING * swayVel  +  (scroll push)
 //     swayVel += force * dt;  sway += swayVel * dt
 //
+// "Luxury silk" tuning: soft overshoot, ~0.6s settle. Dropping STIFFNESS or
+// raising DAMPING makes it more underwater; the inverse makes it athletic.
+const STIFFNESS = 8.0;
+const DAMPING   = 3.0;
+const PUSH      = 0.55;
+// Signed-square mapping: slow drift stays calm, hard flicks hit dramatically.
+// Clamp absolute velocity so a frame-spike (tab refocus) can't catapult the object.
+function force(v) {
+  const clamped = Math.max(-3, Math.min(3, v));
+  return Math.sign(clamped) * clamped * clamped * PUSH;
+}
 function scrollPhysics(product, v, dt) {
-  // --- placeholder so the scene runs: a flat, lifeless lean. Replace me. ---
-  const target = v * 0.12;
-  product.userData.sway = (product.userData.sway ?? 0) + (target - (product.userData.sway ?? 0)) * 0.08;
-  product.rotation.z = product.userData.sway;
+  // Per-product phase: same physics, different timing, so the swarm desyncs.
+  const seed = product.userData.floatSeed ?? 0;
+  const mass = 0.85 + 0.30 * Math.sin(seed * 1.7);   // 0.55..1.15, varies springback
+  const k = STIFFNESS / mass;
+  const c = DAMPING   / Math.sqrt(mass);
+  // Clamp dt — tab-switches return dt of seconds, which would explode integration.
+  const h = Math.min(dt, 1 / 30);
 
-  // TODO(you): implement the spring-damper above for real weight & overshoot.
-  // Tune STIFFNESS / DAMPING until a hard flick makes it swing past center and
-  // settle — that overshoot is the whole illusion of mass.
+  // Sway state (pendulum angle, primary read).
+  let s  = product.userData.sway    ?? 0;
+  let sv = product.userData.swayVel ?? 0;
+  const fS = -k * s - c * sv + force(v);
+  sv += fS * h;
+  s  += sv * h;
+  product.userData.sway    = s;
+  product.userData.swayVel = sv;
+
+  // Drift state (lateral parallax, secondary read — weaker, slightly slower).
+  let d  = product.userData.drift    ?? 0;
+  let dv = product.userData.driftVel ?? 0;
+  const fD = -k * 0.6 * d - c * 1.2 * dv + force(v) * 0.35;
+  dv += fD * h;
+  d  += dv * h;
+  product.userData.drift    = d;
+  product.userData.driftVel = dv;
+
+  // Apply: rotation.z = pendulum, position.x = drift (additive — preserve baseX).
+  if (product.userData.baseX === undefined) product.userData.baseX = product.position.x;
+  product.rotation.z = s;
+  product.position.x = product.userData.baseX + d * 0.7;
 }
 
 // Public entry point — main.js calls this for every product each frame.
