@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SACRO / PROFANO — A Renaissance of Streetwear</title>
+  <meta name="description" content="A cinematic digital museum where classical paintings meet floating streetwear." />
+
+  <!-- Editorial serif pairing: a high-contrast display serif + a refined text serif -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="./src/style.css" />
+
+  <!-- Map bare module specifiers so `import 'three'` works straight in the browser -->
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/",
+      "gsap": "https://esm.sh/gsap@3.12.5",
+      "gsap/ScrollTrigger": "https://esm.sh/gsap@3.12.5/ScrollTrigger",
+      "lenis": "https://esm.sh/lenis@1.1.18"
+    }
+  }
+  </script>
+</head>
+<body>
+  <!-- Fixed WebGL stage — everything 3D renders here, behind the scrolling text -->
+  <canvas id="stage"></canvas>
+
+  <!-- Film grain + vignette overlay for analog warmth -->
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <!-- Loading veil -->
+  <div id="veil">
+    <div class="veil__mark">SACRO<span>/</span>PROFANO</div>
+    <div class="veil__bar"><i></i></div>
+    <div class="veil__hint">entering the gallery</div>
+  </div>
+
+  <!-- Scrolling editorial content. Each <section> is a "room" tied to a 3D scene. -->
+  <main id="scroll">
+
+    <section class="room" data-room="0" data-product="venus-sneaker">
+      <div class="kicker">Collection 01 — Spring / Eternity</div>
+      <h1 class="display">The<br><em>Birth</em><br>of Hype</h1>
+      <p class="lede">Venus steps from the foam in air-cushioned soles. Five centuries collapse into a single drop.</p>
+      <div class="scroll-cue">scroll to drift ↓</div>
+    </section>
+
+    <section class="room" data-room="1" data-product="adam-board">
+      <div class="kicker">Collection 02 — The Spark</div>
+      <h2 class="display align-right">A Touch<br>Away From<br><em>Divine</em></h2>
+      <p class="lede align-right">Between two fingers, the gap that made man — now bridged by seven plies of maple.</p>
+    </section>
+
+    <section class="room" data-room="2" data-product="annunciation-bag">
+      <div class="kicker">Collection 03 — Annunciation</div>
+      <h2 class="display">Carried<br>Like<br><em>Gospel</em></h2>
+      <p class="lede">An angel delivers the news in a paper bag. What you carry is what you worship.</p>
+    </section>
+
+    <section class="room" data-room="3" data-product="last-supper-sneaker">
+      <div class="kicker">Collection 04 — The Table</div>
+      <h2 class="display align-right">Twelve<br>Colorways,<br><em>One</em> Saviour</h2>
+      <p class="lede align-right">A long table, a limited run. Betrayal sold out in ninety seconds.</p>
+    </section>
+
+    <section class="room outro" data-room="4" data-product="finale">
+      <div class="kicker">SACRO / PROFANO</div>
+      <h2 class="display center">The Museum<br>Never<br><em>Closes</em></h2>
+      <p class="lede center">An ongoing exhibition at the intersection of the sacred and the sold-out.</p>
+      <div class="colophon">Renaissance × Streetwear · WebGL · 2026</div>
+    </section>
+
+  </main>
+
+  <!-- HUD: persistent editorial chrome -->
+  <header class="hud hud--top">
+    <span class="hud__brand">SACRO / PROFANO</span>
+    <span class="hud__index" id="roomIndex">00 / 04</span>
+  </header>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>
